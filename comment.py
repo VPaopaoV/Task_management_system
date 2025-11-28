@@ -2,17 +2,22 @@ import tkinter as tk
 from tkinter import ttk, messagebox, scrolledtext
 from datetime import datetime
 import json
-
+import config
+from tools import *
 
 class CommentSystem:
     def __init__(self):
-        self.comments = []
+        self.comments = config.COMMENTS
         self.next_id = 1
-        self.tasks = {
-            1: "开发登录功能",
-            2: "设计数据库",
-            3: "编写测试用例"
-        }
+        self.tasks = {}
+        for task in config.COMPLETED_TASKS:
+            self.tasks[task.id] = task.title
+        # self.tasks = {
+        #     1: "开发登录功能",
+        #     2: "设计数据库",
+        #     3: "编写测试用例",
+        #     4: "test"
+        # }
 
     def add_comment(self, task_id, author, content):
         if not content.strip():
@@ -23,10 +28,12 @@ class CommentSystem:
             'task_id': task_id,
             'author': author,
             'content': content.strip(),
-            'time': datetime.now().strftime("%m-%d %H:%M")
+            'time': datetime.now().strftime("%Y-%m-%d %H:%M")
         }
 
         self.comments.append(comment)
+        config.COMMENTS = self.comments
+        save_comments(config.COMMENTS)
         self.next_id += 1
         return True
 
@@ -38,9 +45,9 @@ class CommentApp:
     def __init__(self, root):
         self.root = root
         self.system = CommentSystem()
-        self.current_user = "当前用户"
+        self.current_user = config.CURRENT_USER
         self.setup_ui()
-        print("界面初始化完成")  # 调试信息
+        # print("界面初始化完成")  # 调试信息
 
     def setup_ui(self):
         self.root.title("任务评论系统")
@@ -85,7 +92,7 @@ class CommentApp:
         ttk.Button(btn_frame, text="发表评论", command=self.post_comment).pack(side=tk.LEFT, padx=2)
         ttk.Button(btn_frame, text="查看评论", command=self.view_comments).pack(side=tk.LEFT, padx=2)
         ttk.Button(btn_frame, text="历史记录", command=self.show_history).pack(side=tk.LEFT, padx=2)
-        ttk.Button(btn_frame, text="清空", command=self.clear_input).pack(side=tk.LEFT, padx=2)
+        # ttk.Button(btn_frame, text="清空", command=self.clear_input).pack(side=tk.LEFT, padx=2)
 
         # 底部 - 评论显示
         bottom_frame = ttk.Frame(main_frame)
@@ -95,7 +102,7 @@ class CommentApp:
         self.display_area = scrolledtext.ScrolledText(bottom_frame, height=15)
         self.display_area.pack(fill=tk.BOTH, expand=True)
 
-        print("所有UI组件创建完成")  # 调试信息
+        # print("所有UI组件创建完成")  # 调试信息
 
     def get_task_id(self):
         text = self.task_var.get()
@@ -161,13 +168,16 @@ class CommentApp:
 
 
 # 运行程序
-if __name__ == "__main__":
+# if __name__ == "__main__":
+
+def comment() -> None:
+    config.COMMENTS = load_comments()
     try:
         root = tk.Tk()
-        print("Tk根窗口创建成功")  # 调试信息
+        # print("Tk根窗口创建成功")  # 调试信息
         app = CommentApp(root)
-        print("开始主循环")  # 调试信息
+        # print("开始主循环")  # 调试信息
         root.mainloop()
-        print("主循环结束")  # 调试信息
+        # print("主循环结束")  # 调试信息
     except Exception as e:
         print(f"程序出错: {e}")
