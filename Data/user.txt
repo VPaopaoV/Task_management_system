@@ -1,0 +1,3 @@
+#user.txt
+name: Admin role: admin privilege: 0 password: admin
+name: Bob role: manager privilege: 1 password: 123
